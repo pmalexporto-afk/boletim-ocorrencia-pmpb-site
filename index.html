@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><script src="https://myhub.ia.br/canvas-vendor/tailwind.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Formulário de Boletim de Ocorrência - PMPB</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #172033;
+      background: #f4f7fb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header {
+      background: #0f172a;
+      color: white;
+      padding: 24px 18px;
+    }
+    .header-inner, main { width: min(100% - 28px, 1000px); margin: 0 auto; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand img { width: 56px; height: 56px; object-fit: contain; background: white; border-radius: 8px; padding: 4px; }
+    .brand strong { color: #bfdbfe; text-transform: uppercase; letter-spacing: .04em; }
+    h1 { margin: 18px 0 6px; font-size: clamp(24px, 4vw, 34px); }
+    header p { margin: 0; color: #cbd5e1; line-height: 1.5; }
+    main { padding: 24px 0 48px; }
+    .notice {
+      border: 1px solid #fcd34d;
+      background: #fffbeb;
+      color: #78350f;
+      border-radius: 12px;
+      padding: 13px 15px;
+      margin-bottom: 18px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .section {
+      background: white;
+      border: 1px solid #dbe3ee;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px #0f172a0a;
+    }
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    h2 { margin: 0; font-size: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .field { display: block; min-width: 0; }
+    .field.wide { grid-column: span 2; }
+    .field.full { grid-column: 1 / -1; }
+    label span {
+      display: block;
+      margin-bottom: 6px;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      background: white;
+      padding: 10px 11px;
+      color: #172033;
+      font: inherit;
+      font-size: 14px;
+    }
+    textarea { min-height: 100px; resize: vertical; }
+    input:focus, textarea:focus, select:focus {
+      outline: 2px solid #bfdbfe;
+      border-color: #2563eb;
+    }
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 10px 14px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .add-button { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .remove-button { background: transparent; color: #b91c1c; padding: 6px 9px; }
+    .primary-button { background: #1d4ed8; color: white; padding: 13px 18px; }
+    .secondary-button { background: white; color: #334155; border: 1px solid #cbd5e1; }
+    .repeat-item {
+      border: 1px solid #dbe3ee;
+      background: #f8fafc;
+      border-radius: 11px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .repeat-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .repeat-heading strong { font-size: 14px; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      position: sticky;
+      bottom: 0;
+      padding: 12px 0;
+      background: #f4f7fbf2;
+    }
+    #documentView { display: none; }
+    .document {
+      background: white;
+      color: #111827;
+      width: min(100%, 900px);
+      margin: 20px auto;
+      padding: 38px;
+      box-shadow: 0 2px 14px #0f172a18;
+    }
+    .doc-header { text-align: center; border-bottom: 2px solid #111827; padding-bottom: 16px; margin-bottom: 20px; }
+    .doc-header img { width: 72px; height: 72px; object-fit: contain; display: block; margin: 0 auto 8px; }
+    .doc-header p { margin: 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: .08em; }
+    .doc-header h2 { margin-top: 12px; font-size: 16px; text-transform: uppercase; }
+    .doc-section { margin: 18px 0; break-inside: avoid; }
+    .doc-section h3 { font-size: 13px; text-transform: uppercase; border-bottom: 2px solid #334155; padding-bottom: 5px; margin: 0 0 7px; }
+    .doc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; }
+    .doc-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .doc-grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .doc-value { border-bottom: 1px solid #cbd5e1; padding: 7px 0; min-width: 0; }
+    .doc-value small { display: block; font-size: 9px; font-weight: bold; text-transform: uppercase; color: #64748b; }
+    .doc-value div { font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; min-height: 15px; }
+    .doc-text { border: 1px solid #94a3b8; padding: 10px; font-size: 12px; white-space: pre-wrap; min-height: 50px; }
+    .signature { border-top: 1px solid #111827; width: 280px; margin: 48px auto 0; padding-top: 7px; text-align: center; font-size: 10px; }
+    .document-actions { width: min(100% - 28px, 900px); margin: 14px auto; display: flex; gap: 10px; flex-wrap: wrap; }
+    @media (max-width: 700px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .field.wide { grid-column: 1 / -1; }
+      .doc-grid.cols-3, .doc-grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .document { padding: 22px 16px; }
+    }
+    @media (max-width: 460px) {
+      .grid, .doc-grid, .doc-grid.cols-3, .doc-grid.cols-4 { grid-template-columns: 1fr; }
+      .field.wide, .field.full { grid-column: auto; }
+      .section { padding: 15px; }
+    }
+    @media print {
+      @page { size: A4; margin: 12mm; }
+      body { background: white; }
+      header, #formView, .document-actions { display: none !important; }
+      #documentView { display: block !important; }
+      .document { width: 100%; margin: 0; padding: 0; box-shadow: none; }
+      .doc-section, .repeat-item { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <img src="./PMPB175px_02.png.png" alt="Brasão da Polícia Militar da Paraíba">
+        <strong>Polícia Militar da Paraíba</strong>
+      </div>
+      <h1>Boletim de Ocorrência</h1>
+      <p>Preencha os dados da ocorrência. Os grupos de pessoas e itens permitem adicionar registros adicionais.</p>
+    </div>
+  </header>
+
+  <main id="formView">
+    <div class="notice">
+      Protótipo: os dados são mantidos somente nesta sessão do navegador. Não utilize informações reais até que o formulário esteja publicado em ambiente seguro e autorizado.
+    </div>
+
+    <form id="boForm">
+      <section class="section">
+        <div class="section-heading"><h2>Identificação e dados da ocorrência</h2></div>
+        <div class="grid">
+          <label class="field"><span>UOp / SUOp</span><input name="uop"></label>
+          <label class="field"><span>CICC Nº</span><input name="cicc"></label>
+          <label class="field"><span>Data da ocorrência</span><input name="dataOcorrencia" type="date"></label>
+          <label class="field"><span>Hora</span><input name="hora" type="time"></label>
+          <label class="field wide"><span>Endereço da ocorrência (rua, bairro, cidade)</span><input name="enderecoOcorrencia"></label>
+          <label class="field"><span>Ponto de referência</span><input name="referenciaOcorrencia"></label>
+          <label class="field"><span>Natureza da ocorrência</span><input name="natureza"></label>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading"><h2>Solicitante</h2></div>
+        <div class="grid">
+          <label class="field"><span>Nome completo do solicitante</span><input name="solicitante"></label>
+          <label class="field"><span>Número(s) de telefone</span><input name="telefoneSolicitante"></label>
+          <label class="field"><span>Endereço completo</span><input name="enderecoSolicitante"></label>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <h2>Militares envolvidos na ocorrência</h2>
+          <button class="add-button" type="button" data-add="militares">+ Adicionar militar</button>
+        </div>
+        <div id="militares"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading"><h2>Acusado(s)</h2><button class="add-button" type="button" data-add="acusados">+ Adicionar acusado</button></div>
+        <div id="acusados"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading"><h2>Vítima(s)</h2><button class="add-button" type="button" data-add="vitimas">+ Adicionar vítima</button></div>
+        <div id="vitimas"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading"><h2>Testemunha(s)</h2><button class="add-button" type="button" data-add="testemunhas">+ Adicionar testemunha</button></div>
+        <div id="testemunhas"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading"><h2>Armas de fogo apreendidas</h2><button class="add-button" type="button" data-add="armas">+ Adicionar arma</button></div>
+        <div id="armas"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading"><h2>Cartuchos apreendidos</h2><button class="add-button" type="button" data-add="cartuchos">+ Adicionar cartuchos</button></div>
+        <div id="cartuchos"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading"><h2>Outros objetos apreendidos</h2></div>
+        <label class="field"><span>Descrição dos objetos</span><textarea name="outrosObjetos"></textarea></label>
+      </section>
+
+      <section class="section">
+        <div class="section-heading"><h2>Relato da ocorrência</h2></div>
+        <label class="field"><span>Relato</span><textarea name="relato"></textarea></label>
+      </section>
+
+      <section class="section">
+        <div class="section-heading"><h2>Resistência à prisão e uso de algemas</h2></div>
+        <div class="grid">
+          <label class="field"><span>Houve resistência à prisão?</span><select name="resistencia"><option value="">Selecione</option><option>Não</option><option>Sim</option></select></label>
+          <label class="field"><span>Foi necessário o uso de algemas?</span><select name="algemas"><option value="">Selecione</option><option>Não</option><option>Sim</option></select></label>
+          <label class="field"><span>Hora do recebimento</span><input name="horaRecebimento" type="time"></label>
+          <label class="field"><span>Nome e matrícula de quem recebeu</span><input name="recebendo"></label>
+          <label class="field full" id="relatoResistenciaWrap" hidden><span>Relato da resistência</span><textarea name="relatoResistencia"></textarea></label>
+          <label class="field full" id="relatoAlgemasWrap" hidden><span>Relato sobre o uso de algemas</span><textarea name="relatoAlgemas"></textarea></label>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button type="button" class="primary-button" id="previewButton">Visualizar documento</button>
+      </div>
+    </form>
+  </main>
+
+  <section id="documentView">
+    <div class="document-actions">
+      <button type="button" class="secondary-button" id="backButton">Voltar para editar</button>
+      <button type="button" class="primary-button" id="printButton">Imprimir / Salvar como PDF</button>
+      <button type="button" class="secondary-button" id="clearButton">Nova ocorrência / limpar dados</button>
+    </div>
+    <article class="document" id="documentContent"></article>
+  </section>
+
+  <script>
+    const peopleFields = [
+      ["Nome completo", "nome"],
+      ["Data de nascimento", "nascimento"],
+      ["Nome completo da genitora", "genitora"],
+      ["RG / órgão expedidor", "rg"],
+      ["CPF", "cpf"],
+      ["Endereço completo (rua, nº, bairro, cidade e UF)", "endereco"],
+      ["CNH", "cnh"],
+      ["Ponto de referência", "referencia"],
+      ["Profissão declarada", "profissao"]
+    ];
+
+    const configs = {
+      militares: {
+        title: "Militar",
+        fields: [["Nome", "nome"], ["Matrícula", "matricula"], ["VTR", "vtr"]],
+        select: { label: "Função", name: "funcao", options: ["Comandante", "Motorista", "Patrulheiro", "Apoio"] }
+      },
+      acusados: { title: "Acusado", fields: peopleFields },
+      vitimas: { title: "Vítima", fields: [...peopleFields, ["Número(s) de telefone", "telefone"]] },
+      testemunhas: { title: "Testemunha", fields: peopleFields },
+      armas: { title: "Arma", fields: [["Tipo", "tipo"], ["Marca", "marca"], ["Calibre", "calibre"], ["Acabamento", "acabamento"], ["Nº de série", "serie"], ["Dimensão do cano", "cano"]] },
+      cartuchos: { title: "Registro", fields: [["Quantidade", "quantidade"], ["Calibre", "calibre"], ["Tipo", "tipo"]] }
+    };
+
+    const counts = Object.fromEntries(Object.keys(configs).map(key => [key, 0]));
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[char]));
+    }
+
+    function addItem(list) {
+      const config = configs[list];
+      const index = counts[list]++;
+      const container = document.getElementById(list);
+      const card = document.createElement("div");
+      card.className = "repeat-item";
+      card.dataset.list = list;
+      card.innerHTML = `
+        <div class="repeat-heading">
+          <strong>${config.title} ${index + 1}</strong>
+          <button class="remove-button" type="button" aria-label="Remover ${config.title.toLowerCase()}">Remover</button>
+        </div>
+        <div class="grid"></div>`;
+      const grid = card.querySelector(".grid");
+
+      config.fields.forEach(([label, name]) => {
+        const field = document.createElement("label");
+        field.className = "field";
+        field.innerHTML = `<span>${escapeHtml(label)}</span><input name="${escapeHtml(name)}">`;
+        grid.appendChild(field);
+      });
+
+      if (config.select) {
+        const field = document.createElement("label");
+        field.className = "field";
+        const options = config.select.options.map(option => `<option>${escapeHtml(option)}</option>`).join("");
+        field.innerHTML = `<span>${escapeHtml(config.select.label)}</span><select name="${escapeHtml(config.select.name)}"><option value="">Selecione a função</option>${options}</select>`;
+        grid.appendChild(field);
+      }
+
+      card.querySelector(".remove-button").addEventListener("click", () => {
+        card.remove();
+        renumber(list);
+      });
+      container.appendChild(card);
+      renumber(list);
+    }
+
+    function renumber(list) {
+      document.querySelectorAll(`#${list} .repeat-item`).forEach((card, index) => {
+        card.querySelector(".repeat-heading strong").textContent = `${configs[list].title} ${index + 1}`;
+      });
+    }
+
+    document.querySelectorAll("[data-add]").forEach(button => {
+      button.addEventListener("click", () => addItem(button.dataset.add));
+    });
+
+    addItem("militares");
+    addItem("testemunhas");
+    addItem("armas");
+    addItem("cartuchos");
+
+    document.querySelector('[name="resistencia"]').addEventListener("change", event => {
+      document.getElementById("relatoResistenciaWrap").hidden = event.target.value !== "Sim";
+    });
+    document.querySelector('[name="algemas"]').addEventListener("change", event => {
+      document.getElementById("relatoAlgemasWrap").hidden = event.target.value !== "Sim";
+    });
+
+    function readForm() {
+      const form = document.getElementById("boForm");
+      const data = {};
+      new FormData(form).forEach((value, key) => {
+        if (!key.includes("[]")) data[key] = value;
+      });
+      Object.keys(configs).forEach(list => {
+        data[list] = [...document.querySelectorAll(`#${list} .repeat-item`)].map(card => {
+          const item = {};
+          card.querySelectorAll("input, select").forEach(input => item[input.name] = input.value);
+          return item;
+        });
+      });
+      return data;
+    }
+
+    function valueBlock(label, value) {
+      return `<div class="doc-value"><small>${escapeHtml(label)}</small><div>${escapeHtml(value || "—")}</div></div>`;
+    }
+
+    function peopleSection(title, people, includePhone) {
+      if (!people.length && (title === "Acusado(s)" || title === "Vítima(s)")) return "";
+      if (!people.length) return `<section class="doc-section"><h3>${title}</h3><p>Nenhum item informado.</p></section>`;
+      return `<section class="doc-section"><h3>${title}</h3>${people.map((person, index) => `
+        <div class="doc-grid">
+          ${valueBlock(`Registro ${index + 1} · Nome completo`, person.nome)}
+          ${valueBlock("Data de nascimento", person.nascimento)}
+          ${valueBlock("Nome da genitora", person.genitora)}
+          ${valueBlock("RG / órgão expedidor", person.rg)}
+          ${valueBlock("CPF", person.cpf)}
+          ${valueBlock("Endereço completo", person.endereco)}
+          ${valueBlock("CNH", person.cnh)}
+          ${valueBlock("Ponto de referência", person.referencia)}
+          ${valueBlock("Profissão declarada", person.profissao)}
+          ${includePhone ? valueBlock("Telefone(s)", person.telefone) : ""}
+        </div>`).join("")}</section>`;
+    }
+
+    function renderDocument(data) {
+      const textSection = (title, text) =>
+        `<section class="doc-section"><h3>${title}</h3><div class="doc-text">${escapeHtml(text || " ")}</div></section>`;
+      const listSection = (title, items, fields) => `
+        <section class="doc-section"><h3>${title}</h3>
+          ${items.length ? items.map((item, index) => `
+            <div class="doc-grid cols-${fields.length === 4 ? "4" : fields.length >= 6 ? "3" : "3"}">
+              ${fields.map(([label, key], fieldIndex) => valueBlock(fieldIndex === 0 ? `${title.replace(/\(s\)/g, "")} ${index + 1} · ${label}` : label, item[key])).join("")}
+            </div>`).join("") : "<p>Nenhum item informado.</p>"}
+        </section>`;
+
+      const military = data.militares.map((item, index) => `
+        <div class="doc-grid cols-4">
+          ${valueBlock(`Militar ${index + 1} · Nome`, item.nome)}
+          ${valueBlock("Matrícula", item.matricula)}
+          ${valueBlock("VTR", item.vtr)}
+          ${valueBlock("Função", item.funcao)}
+        </div>`).join("") || "<p>Nenhum militar informado.</p>";
+
+      return `
+        <header class="doc-header">
+          <img src="./PMPB175px_02.png.png" alt="Brasão da Polícia Militar da Paraíba">
+          <p>Governo da Paraíba</p>
+          <h2>Polícia Militar da Paraíba</h2>
+          <h2>Boletim de Ocorrência</h2>
+        </header>
+        <section class="doc-section"><h3>Dados da ocorrência</h3><div class="doc-grid">
+          ${valueBlock("UOp / SUOp", data.uop)}
+          ${valueBlock("CICC Nº", data.cicc)}
+          ${valueBlock("Data da ocorrência", data.dataOcorrencia)}
+          ${valueBlock("Hora", data.hora)}
+          ${valueBlock("Endereço da ocorrência", data.enderecoOcorrencia)}
+          ${valueBlock("Ponto de referência", data.referenciaOcorrencia)}
+          ${valueBlock("Natureza da ocorrência", data.natureza)}
+          ${valueBlock("Solicitante", data.solicitante)}
+          ${valueBlock("Telefone(s) do solicitante", data.telefoneSolicitante)}
+          ${valueBlock("Endereço completo do solicitante", data.enderecoSolicitante)}
+        </div></section>
+        <section class="doc-section"><h3>Militares envolvidos na ocorrência</h3>${military}</section>
+        ${peopleSection("Acusado(s)", data.acusados, false)}
+        ${peopleSection("Vítima(s)", data.vitimas, true)}
+        ${peopleSection("Testemunha(s)", data.testemunhas, false)}
+        ${listSection("Armas de fogo apreendidas", data.armas, [["Tipo","tipo"],["Marca","marca"],["Calibre","calibre"],["Acabamento","acabamento"],["Nº de série","serie"],["Dimensão do cano","cano"]])}
+        ${listSection("Cartuchos apreendidos", data.cartuchos, [["Quantidade","quantidade"],["Calibre","calibre"],["Tipo","tipo"]])}
+        ${textSection("Outros objetos apreendidos", data.outrosObjetos)}
+        ${textSection("Relato da ocorrência", data.relato)}
+        <section class="doc-section"><div class="doc-grid">
+          ${valueBlock("Houve resistência à prisão?", data.resistencia)}
+          ${data.resistencia === "Sim" ? valueBlock("Relato da resistência", data.relatoResistencia) : ""}
+          ${valueBlock("Foi necessário o uso de algemas?", data.algemas)}
+          ${data.algemas === "Sim" ? valueBlock("Relato sobre o uso de algemas", data.relatoAlgemas) : ""}
+        </div></section>
+        <section class="doc-section"><div class="doc-grid">
+          ${valueBlock("Hora do recebimento", data.horaRecebimento)}
+          ${valueBlock("Nome e matrícula de quem recebeu", data.recebendo)}
+        </div></section>
+        <div class="signature">Assinatura do responsável pelo recebimento</div>`;
+    }
+
+    document.getElementById("previewButton").addEventListener("click", () => {
+      document.getElementById("documentContent").innerHTML = renderDocument(readForm());
+      document.getElementById("formView").style.display = "none";
+      document.getElementById("documentView").style.display = "block";
+      window.scrollTo(0, 0);
+    });
+
+    document.getElementById("backButton").addEventListener("click", () => {
+      document.getElementById("documentView").style.display = "none";
+      document.getElementById("formView").style.display = "block";
+      window.scrollTo(0, 0);
+    });
+
+    document.getElementById("printButton").addEventListener("click", () => window.print());
+
+    document.getElementById("clearButton").addEventListener("click", () => {
+      if (confirm("Iniciar uma nova ocorrência e limpar todos os dados?")) {
+        document.getElementById("boForm").reset();
+        Object.keys(configs).forEach(list => {
+          document.getElementById(list).innerHTML = "";
+          counts[list] = 0;
+        });
+        addItem("militares");
+        addItem("testemunhas");
+        addItem("armas");
+        addItem("cartuchos");
+        document.getElementById("documentContent").innerHTML = "";
+        document.getElementById("documentView").style.display = "none";
+        document.getElementById("formView").style.display = "block";
+        window.scrollTo(0, 0);
+      }
+    });
+  </script>
+</body>
+</html>
