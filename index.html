@@ -158,7 +158,7 @@
   <header>
     <div class="header-inner">
       <div class="brand">
-        <img src="./PMPB175px_02.png" alt="Brasão da Polícia Militar da Paraíba">
+        <img src="https://pmalexporto-afk.github.io/boletim-ocorrencia-pmpb-site/PMPB175px_02.png" alt="Brasão da Polícia Militar da Paraíba">
         <strong>Polícia Militar da Paraíba</strong>
       </div>
       <h1>Boletim de Ocorrência</h1>
@@ -414,7 +414,7 @@
 
       return `
         <header class="doc-header">
-          <img src="./PMPB175px_02.png" alt="Brasão da Polícia Militar da Paraíba">
+          <img src="https://pmalexporto-afk.github.io/boletim-ocorrencia-pmpb-site/PMPB175px_02.png" alt="Brasão da Polícia Militar da Paraíba">
           <p>Governo da Paraíba</p>
           <h2>Polícia Militar da Paraíba</h2>
           <h2>Boletim de Ocorrência</h2>
@@ -465,7 +465,34 @@
       window.scrollTo(0, 0);
     });
 
-    document.getElementById("printButton").addEventListener("click", () => window.print());
+    document.getElementById("printButton").addEventListener("click", async () => {
+      const logo = document.querySelector("#documentContent .doc-header img");
+
+      if (logo && !logo.complete) {
+        await new Promise(resolve => {
+          const timeout = setTimeout(resolve, 5000);
+          const finish = () => {
+            clearTimeout(timeout);
+            resolve();
+          };
+          logo.addEventListener("load", finish, { once: true });
+          logo.addEventListener("error", finish, { once: true });
+        });
+      }
+
+      if (logo?.decode && logo.naturalWidth > 0) {
+        try {
+          await logo.decode();
+        } catch {}
+      }
+
+      if (logo && logo.naturalWidth === 0) {
+        alert("A logo não foi carregada. Verifique se o arquivo PMPB175px_02.png está na raiz do repositório e com esse nome exato.");
+        return;
+      }
+
+      window.print();
+    });
 
     document.getElementById("clearButton").addEventListener("click", () => {
       if (confirm("Iniciar uma nova ocorrência e limpar todos os dados?")) {
